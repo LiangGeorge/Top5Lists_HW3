@@ -17,7 +17,8 @@ export const GlobalStoreActionType = {
     CLOSE_CURRENT_LIST: "CLOSE_CURRENT_LIST",
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
-    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE"
+    SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
+    ADD_NEW_LIST: "ADD_NEW_LIST"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -40,7 +41,18 @@ export const useGlobalStore = () => {
     // HANDLE EVERY TYPE OF STATE CHANGE
     const storeReducer = (action) => {
         const { type, payload } = action;
+        console.log("called");
         switch (type) {
+            case GlobalStoreActionType.ADD_NEW_LIST:{
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: null,
+                    newListCounter: store.newListCounter++,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: null
+                });
+            }
             // LIST UPDATE OF ITS NAME
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
@@ -103,6 +115,29 @@ export const useGlobalStore = () => {
     // THESE ARE THE FUNCTIONS THAT WILL UPDATE OUR STORE AND
     // DRIVE THE STATE OF THE APPLICATION. WE'LL CALL THESE IN 
     // RESPONSE TO EVENTS INSIDE OUR COMPONENTS.
+
+    store.addNewList = function () {
+       
+        async function asyncAddNewList(){
+            let payload = {
+                "name": "Untitled " + store.newListCounter,
+                "items": ["?","?","?","?","?"]
+            }
+            let response = await api.createTop5List(payload);
+            if (response.data.success){
+                console.log(response.data);
+                storeReducer({
+                    type: GlobalStoreActionType.ADD_NEW_LIST,
+                    payload: {}
+                });
+                console.log(store.newListCounter);
+                store.setCurrentList(response.data.top5List._id)
+               
+            }
+        }
+        asyncAddNewList();
+    }
+
 
     // THIS FUNCTION PROCESSES CHANGING A LIST NAME
     store.changeListName = function (id, newName) {
