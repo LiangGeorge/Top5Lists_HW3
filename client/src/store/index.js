@@ -2,6 +2,7 @@ import { createContext, useState } from 'react'
 import jsTPS from '../common/jsTPS'
 import api from '../api'
 import MoveItem_Transaction from '../transactions/MoveItem_Transaction'
+import ChangeItemName_Transaction from '../transactions/ChangeItemName_Transaction'
 export const GlobalStoreContext = createContext({});
 /*
     This is our global data store. Note that it uses the Flux design pattern,
@@ -18,7 +19,8 @@ export const GlobalStoreActionType = {
     LOAD_ID_NAME_PAIRS: "LOAD_ID_NAME_PAIRS",
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
-    ADD_NEW_LIST: "ADD_NEW_LIST"
+    ADD_NEW_LIST: "ADD_NEW_LIST",
+    SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -32,8 +34,10 @@ export const useGlobalStore = () => {
         idNamePairs: [],
         currentList: null,
         newListCounter: 0,
-        listNameActive: false,
-        itemActive: false,
+        // listNameActive: false,
+        // itemActive: false,
+        isListNameEditActive: false, 
+        isItemEditActive: false,
         listMarkedForDeletion: null
     });
 
@@ -97,6 +101,17 @@ export const useGlobalStore = () => {
                     listMarkedForDeletion: null
                 });
             }
+            // Start editing an item name 
+            case GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE: {
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: store.currentList,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: true,
+                    listMarkedForDeletion: null
+                })
+            }
             // START EDITING A LIST NAME
             case GlobalStoreActionType.SET_LIST_NAME_EDIT_ACTIVE: {
                 return setStore({
@@ -120,7 +135,7 @@ export const useGlobalStore = () => {
        
         async function asyncAddNewList(){
             let payload = {
-                "name": "Untitled " + store.newListCounter,
+                "name": "Untitled" + store.newListCounter,
                 "items": ["?","?","?","?","?"]
             }
             let response = await api.createTop5List(payload);
@@ -172,12 +187,36 @@ export const useGlobalStore = () => {
         asyncChangeListName(id);
     }
 
+    store.addChangeItemNameTransaction = function (itemIndex, oldName, newName) {
+      
+        if (oldName !== newName){
+            let transaction = new ChangeItemName_Transaction(store, itemIndex, oldName, newName)
+            tps.addTransaction(transaction)
+        }
+    }
+
+    store.changeItem = function (itemIndex, name) {
+        console.log(itemIndex)
+        store.currentList.items[itemIndex] = name 
+        console.log(store.currentList)
+        storeReducer({
+            type: GlobalStoreActionType.SET_CURRENT_LIST,
+            payload: store.currentList
+        })
+        let payload = {
+            "name": store.currentList.name,
+            "items": store.currentList.items
+        }
+        api.updateTop5ListById(store.currentList._id,payload)
+    }
+
     // THIS FUNCTION PROCESSES CLOSING THE CURRENTLY LOADED LIST
     store.closeCurrentList = function () {
         storeReducer({
             type: GlobalStoreActionType.CLOSE_CURRENT_LIST,
             payload: {}
         });
+        tps.clearAllTransactions();
     }
 
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
@@ -264,6 +303,12 @@ export const useGlobalStore = () => {
         tps.doTransaction();
     }
 
+    store.setIsItemEditActive = function (){
+        storeReducer({
+            type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,
+            payload: null
+        });
+    }
     // THIS FUNCTION ENABLES THE PROCESS OF EDITING A LIST NAME
     store.setIsListNameEditActive = function () {
         storeReducer({
@@ -272,6 +317,7 @@ export const useGlobalStore = () => {
         });
     }
 
+    
     // THIS GIVES OUR STORE AND ITS REDUCER TO ANY COMPONENT THAT NEEDS IT
     return { store, storeReducer };
 }

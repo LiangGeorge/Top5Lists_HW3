@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import Top5Item from './Top5Item.js'
 import { GlobalStoreContext } from '../store'
@@ -12,6 +12,16 @@ function Workspace() {
     const { store } = useContext(GlobalStoreContext);
     store.history = useHistory();
 
+    // console.log(store.history)
+    // console.log(store.currentList)
+    useEffect(() => {
+        if (store.history.location.pathname !== ""){
+            let listId = store.history.location.pathname.substring(10);
+            console.log(listId)
+            store.setCurrentList(listId);
+        }
+    },[])
+    
     let editItems = "";
     if (store.currentList) {
         editItems = 
