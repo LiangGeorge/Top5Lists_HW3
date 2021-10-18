@@ -18,13 +18,15 @@ const ListSelector = () => {
 
     let listCard = "";
     if (store) {
-        listCard = store.idNamePairs.map((pair) => (
-            <ListCard
-                key={pair._id}
-                idNamePair={pair}
-                selected={false}
-            />
-        ))
+        if (store.idNamePairs !== null){
+            listCard = store.idNamePairs.map((pair) => (
+                <ListCard
+                    key={pair._id}
+                    idNamePair={pair}
+                    selected={false}
+                />
+            ))
+        }
     }
 
     function handleAddNewList(){

@@ -78,20 +78,25 @@ console.log("updateTop5List: " + JSON.stringify(body));
     })
 }
 deleteTop5List = async (req, res) => {
-    await Top5List.findOneAndDelete({ _id: req.params.id }, (err, top5List) => {
-        if (err) {
-            return res.status(400).json({ success: false, error: err })
-        }
+    console.log("RUNNING DELETE!!!!!!!!!!!!!!!")
+    await Top5List.findOneAndDelete({ _id: req.params.id }).then (
+        ( top5List, err) => {
+            
+            // console.log(_id)
+            if (err) {
+                return res.status(400).json({ success: false, error: err })
+            }
+    
+            if (!top5List) {
+                return res
+                    .status(404)
+                    .json({ success: false, error: `Top 5 List not found` })
+            }
+    
+            return res.status(200).json({ success: true, data: top5List })
+        }).catch(err => console.log(err))  }
+    
 
-        if (!top5List) {
-            return res
-                .status(404)
-                .json({ success: false, error: `Top 5 List not found` })
-        }
-
-        return res.status(200).json({ success: true, data: top5List })
-    }).catch(err => console.log(err))
-}
 getTop5ListById = async (req, res) => {
     await Top5List.findOne({ _id: req.params.id }, (err, list) => {
         if (err) {
@@ -115,11 +120,21 @@ getTop5Lists = async (req, res) => {
     }).catch(err => console.log(err))
 }
 getTop5ListPairs = async (req, res) => {
+    // console.log("getTop5ListPairs")
     await Top5List.find({}, (err, top5Lists) => {
         if (err) {
             return res.status(400).json({ success: false, error: err})
         }
         if (!top5Lists.length) {
+
+            // console.log("Hit this case")
+            // console.log(top5Lists.length)
+
+            if (top5Lists.length == 0){
+                console.log("Hit THISS case")
+                return res.status(200).json({success: true, idNamePairs: null});
+            }
+
             return res
                 .status(404)
                 .json({ success: false, error: 'Top 5 Lists not found'})

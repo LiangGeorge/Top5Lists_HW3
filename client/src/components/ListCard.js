@@ -28,6 +28,7 @@ function ListCard(props) {
 
     function handleToggleEdit(event) {
         event.stopPropagation();
+        setText(idNamePair.name)
         toggleEdit();
     }
 
@@ -49,6 +50,13 @@ function ListCard(props) {
 
     function handleUpdateText(event) {
         setText(event.target.value );
+    }
+
+    function handleMarkList(event){
+        event.preventDefault();
+        event.stopPropagation();
+        // console.log(event)
+        store.markListForDeletion(idNamePair)
     }
 
     let selectClass = "unselected-list-card";
@@ -76,6 +84,7 @@ function ListCard(props) {
                 type="button"
                 id={"delete-list-" + idNamePair._id}
                 className="list-card-button"
+                onClick={handleMarkList}
                 value={"\u2715"}
             />
             <input

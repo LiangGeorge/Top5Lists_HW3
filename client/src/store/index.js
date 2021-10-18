@@ -20,7 +20,8 @@ export const GlobalStoreActionType = {
     SET_CURRENT_LIST: "SET_CURRENT_LIST",
     SET_LIST_NAME_EDIT_ACTIVE: "SET_LIST_NAME_EDIT_ACTIVE",
     ADD_NEW_LIST: "ADD_NEW_LIST",
-    SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE"
+    SET_ITEM_EDIT_ACTIVE: "SET_ITEM_EDIT_ACTIVE",
+    MARK_LIST_DELETION: "MARK_LIST_DELETION"
 }
 
 // WE'LL NEED THIS TO PROCESS TRANSACTIONS
@@ -45,7 +46,7 @@ export const useGlobalStore = () => {
     // HANDLE EVERY TYPE OF STATE CHANGE
     const storeReducer = (action) => {
         const { type, payload } = action;
-        console.log("called");
+        // console.log("called");
         switch (type) {
             case GlobalStoreActionType.ADD_NEW_LIST:{
                 return setStore({
@@ -61,7 +62,8 @@ export const useGlobalStore = () => {
             case GlobalStoreActionType.CHANGE_LIST_NAME: {
                 return setStore({
                     idNamePairs: payload.idNamePairs,
-                    currentList: payload.top5List,
+                    //currentList: payload.top5List,
+                    currentList: null,
                     newListCounter: store.newListCounter,
                     isListNameEditActive: false,
                     isItemEditActive: false,
@@ -89,6 +91,16 @@ export const useGlobalStore = () => {
                     isItemEditActive: false,
                     listMarkedForDeletion: null
                 });
+            }
+            case GlobalStoreActionType.MARK_LIST_DELETION:{
+                return setStore({
+                    idNamePairs: store.idNamePairs,
+                    currentList: null,
+                    newListCounter: store.newListCounter,
+                    isListNameEditActive: false,
+                    isItemEditActive: false,
+                    listMarkedForDeletion: payload
+                })
             }
             // UPDATE A LIST
             case GlobalStoreActionType.SET_CURRENT_LIST: {
@@ -145,7 +157,7 @@ export const useGlobalStore = () => {
                     type: GlobalStoreActionType.ADD_NEW_LIST,
                     payload: {}
                 });
-                console.log(store.newListCounter);
+                // console.log(store.newListCounter);
                 store.setCurrentList(response.data.top5List._id)
                
             }
@@ -161,7 +173,9 @@ export const useGlobalStore = () => {
             let response = await api.getTop5ListById(id);
             if (response.data.success) {
                 let top5List = response.data.top5List;
+                
                 top5List.name = newName;
+                
                 async function updateList(top5List) {
                     response = await api.updateTop5ListById(top5List._id, top5List);
                     if (response.data.success) {
@@ -173,7 +187,7 @@ export const useGlobalStore = () => {
                                     type: GlobalStoreActionType.CHANGE_LIST_NAME,
                                     payload: {
                                         idNamePairs: pairsArray,
-                                        top5List: top5List
+                                        
                                     }
                                 });
                             }
@@ -219,6 +233,31 @@ export const useGlobalStore = () => {
         tps.clearAllTransactions();
     }
 
+    store.deleteMarkedList = function () {
+        async function asyncDeleteMarkedList(){
+            // console.log(store.markListForDeletion._id)
+            // console.log(store)
+            let response = await api.deleteTop5ListById(store.listMarkedForDeletion._id)
+            
+            if (response.data.success){
+                store.loadIdNamePairs()
+            }
+        }
+        asyncDeleteMarkedList();
+    }
+    store.hideDeleteListModal = function () {
+        storeReducer({
+            type: GlobalStoreActionType.MARK_LIST_DELETION,
+            payload: null
+        })
+    }
+
+    store.markListForDeletion = function(id) {
+        storeReducer({
+            type: GlobalStoreActionType.MARK_LIST_DELETION,
+            payload: id
+        })
+    }
     // THIS FUNCTION LOADS ALL THE ID, NAME PAIRS SO WE CAN LIST ALL THE LISTS
     store.loadIdNamePairs = function () {
         async function asyncLoadIdNamePairs() {

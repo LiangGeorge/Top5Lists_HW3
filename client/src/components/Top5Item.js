@@ -72,6 +72,15 @@ function Top5Item(props) {
         }
     }
 
+    function handleOnBlur(event){
+         
+        let index = event.target.id.substring("item-".length);
+        index-=1
+        console.log(props.text)
+        console.log(text)
+        store.addChangeItemNameTransaction(index, props.text,text);
+        toggleEditActive();
+    }
     function handleUpdateText(event) {
         setText(event.target.value);
     }
@@ -110,6 +119,8 @@ function Top5Item(props) {
                 type='text'
                 onKeyPress={handleKeyPress}
                 onChange={handleUpdateText}
+                onBlur={handleOnBlur}
+                autoFocus={true}
                 defaultValue={props.text}
             />
     }
