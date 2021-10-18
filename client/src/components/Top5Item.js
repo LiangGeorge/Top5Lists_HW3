@@ -45,13 +45,15 @@ function Top5Item(props) {
 
     function toggleEditActive(){
         //console.log(editActive)
+        // console.log(store)
+        setText(props.text)
         let newActive = !editActive
-        //console.log(newActive)
+        // console.log(newActive)
         if (newActive){
             store.setIsItemEditActive()
         }
         setEditActive(newActive)
-        
+        // console.log(store)
     }
     function handleButtonClick(){
         //console.log(editActive)

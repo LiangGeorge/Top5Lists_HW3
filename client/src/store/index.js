@@ -203,16 +203,16 @@ export const useGlobalStore = () => {
 
     store.addChangeItemNameTransaction = function (itemIndex, oldName, newName) {
       
-        if (oldName !== newName){
-            let transaction = new ChangeItemName_Transaction(store, itemIndex, oldName, newName)
-            tps.addTransaction(transaction)
-        }
+
+        let transaction = new ChangeItemName_Transaction(store, itemIndex, oldName, newName)
+        tps.addTransaction(transaction)
+        
     }
 
     store.changeItem = function (itemIndex, name) {
-        console.log(itemIndex)
+        //console.log(itemIndex)
         store.currentList.items[itemIndex] = name 
-        console.log(store.currentList)
+        //console.log(store.currentList)
         storeReducer({
             type: GlobalStoreActionType.SET_CURRENT_LIST,
             payload: store.currentList

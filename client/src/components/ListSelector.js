@@ -35,16 +35,20 @@ const ListSelector = () => {
 
     }
 
+    let addBtnStatus = "";
+    if (store.isListNameEditActive || store.listMarkedForDeletion !== null){
+        addBtnStatus="-disabled";
+    }
     return (
         <div id="top5-list-selector">
             <div id="list-selector-heading">
                 <input
                     type="button"
                     id="add-list-button"
-                    className={"top5-button" + ((store.isListNameEditActive)? "-disabled":"")}
+                    className={"top5-button" + addBtnStatus}
                     value="+" 
                     onClick={handleAddNewList}
-                    disabled={store.isListNameEditActive}
+                    disabled={addBtnStatus}
                 />
                 Your Lists
             </div>
