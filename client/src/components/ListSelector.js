@@ -41,9 +41,10 @@ const ListSelector = () => {
                 <input
                     type="button"
                     id="add-list-button"
-                    className="top5-button"
+                    className={"top5-button" + ((store.isListNameEditActive)? "-disabled":"")}
                     value="+" 
                     onClick={handleAddNewList}
+                    disabled={store.isListNameEditActive}
                 />
                 Your Lists
             </div>

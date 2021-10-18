@@ -342,6 +342,13 @@ export const useGlobalStore = () => {
         tps.doTransaction();
     }
 
+    store.hasUndo = function(){
+        return tps.hasTransactionToUndo();
+    }
+
+    store.hasRedo = function(){
+        return tps.hasTransactionToRedo();
+    }
     store.setIsItemEditActive = function (){
         storeReducer({
             type: GlobalStoreActionType.SET_ITEM_EDIT_ACTIVE,

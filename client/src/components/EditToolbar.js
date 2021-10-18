@@ -22,31 +22,62 @@ function EditToolbar() {
         history.push("/");
         store.closeCurrentList();
     }
+
+    function currentListNull(){
+        //console.log(store.currentList === null);
+        return store.currentList === null
+    }
+
     let editStatus = false;
     if (store.isListNameEditActive) {
         editStatus = true;
     }
+
+
+    let undoBtnStatus = ""
+    let redoBtnStatus = ""
+    let closeBtnStatus = ""
+
+    if (!store.hasUndo()){
+        undoBtnStatus="-disabled"
+    }
+
+    if (!store.hasRedo()){
+        redoBtnStatus="-disabled"
+    }
+
+    if (store.currentList === null){
+        closeBtnStatus="-disabled"
+    }
+    //console.log(store.isitemEditActive)
+    if (store.isItemEditActive || (store.listMarkedForDeletion !== null) || store.isListNameEditActive){
+        undoBtnStatus = "-disabled"
+        redoBtnStatus = "-disabled"
+        closeBtnStatus = "-disabled"
+    }
+
+
     return (
         <div id="edit-toolbar">
             <div
                 disabled={editStatus}
-                id='undo-button'
+                id='undo-button' 
                 onClick={handleUndo}
-                className={enabledButtonClass}>
+                className={enabledButtonClass + undoBtnStatus}>
                 &#x21B6;
             </div>
             <div
                 disabled={editStatus}
                 id='redo-button'
                 onClick={handleRedo}
-                className={enabledButtonClass}>
+                className={enabledButtonClass + redoBtnStatus}>
                 &#x21B7;
             </div>
             <div
                 disabled={editStatus}
                 id='close-button'
                 onClick={handleClose}
-                className={enabledButtonClass}>
+                className={enabledButtonClass + closeBtnStatus}>
                 &#x24E7;
             </div>
         </div>

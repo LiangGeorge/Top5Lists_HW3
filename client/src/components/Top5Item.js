@@ -44,9 +44,9 @@ function Top5Item(props) {
     }
 
     function toggleEditActive(){
-        console.log(editActive)
+        //console.log(editActive)
         let newActive = !editActive
-        console.log(newActive)
+        //console.log(newActive)
         if (newActive){
             store.setIsItemEditActive()
         }
@@ -65,8 +65,8 @@ function Top5Item(props) {
             
             let index = event.target.id.substring("item-".length);
             index-=1
-            console.log(props.text)
-            console.log(text)
+            // console.log(props.text)
+            // console.log(text)
             store.addChangeItemNameTransaction(index, props.text,text);
             toggleEditActive();
         }
@@ -76,8 +76,8 @@ function Top5Item(props) {
          
         let index = event.target.id.substring("item-".length);
         index-=1
-        console.log(props.text)
-        console.log(text)
+        // console.log(props.text)
+        // console.log(text)
         store.addChangeItemNameTransaction(index, props.text,text);
         toggleEditActive();
     }
